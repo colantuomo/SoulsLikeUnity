@@ -311,7 +311,7 @@ namespace StarterAssets
 
             direction.Normalize();
 
-            _controller.Move(direction * (Time.deltaTime * StrafeSpeed));
+            _controller.Move(new Vector3(direction.x, _verticalVelocity, direction.z) * (Time.deltaTime * StrafeSpeed));
 
 
             // rotate towards the target
