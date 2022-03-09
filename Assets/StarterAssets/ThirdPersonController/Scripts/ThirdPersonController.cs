@@ -131,6 +131,7 @@ namespace StarterAssets
         {
             _hasAnimator = TryGetComponent(out _animator);
             _animator.SetBool("Strafe", _input.strafe);
+            _animator.SetBool("Rolling", _isRolling);
             JumpAndGravity();
             OnPlayerRoll();
             GroundedCheck();
@@ -228,7 +229,7 @@ namespace StarterAssets
                 _speed = targetSpeed;
             }
 
-            if (_input.strafe)
+            if (_input.strafe && !_isRolling)
             {
                 MoveStrafe();
                 return;
@@ -395,10 +396,12 @@ namespace StarterAssets
 
             if (Grounded && _input.jump && _localInputMovement != Vector2.zero)
             {
+                _input.strafe = false;
                 _currentRollInputDirection = _localInputMovement;
-                _isRolling = true;
                 _animator.SetTrigger(_animIDRoll);
+                _isRolling = true;
                 _input.jump = false;
+                PlayerManager.PlayerStates.currentState = States.Walking;
             }
         }
 
