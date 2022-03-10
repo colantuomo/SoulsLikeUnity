@@ -13,6 +13,8 @@ enum Attacks
 
 public class CombatController : MonoBehaviour
 {
+    [SerializeField]
+    private Transform _hitBox;
     private Animator _animator;
     private bool _isBlocking;
     private InputAction _blockingAction;
@@ -153,19 +155,31 @@ public class CombatController : MonoBehaviour
 
     private bool ComboExists(List<Attacks> playerCombo, Attacks[] combo)
     {
-        Debug.Log(playerCombo.Count + " / " + combo.Length);
+        // Debug.Log(playerCombo.Count + " / " + combo.Length);
         bool playerComboIsBiggerThanCurrentCombo = playerCombo.Count > combo.Length;
         if (playerComboIsBiggerThanCurrentCombo) return false;
         bool isACombo = true;
         for (int i = 0; i < playerCombo.Count; i++)
         {
-            Debug.Log("Index: " + i + " / Player combo: " + playerCombo[i] + " / Game Combo: " + combo[i]);
+            // Debug.Log("Index: " + i + " / Player combo: " + playerCombo[i] + " / Game Combo: " + combo[i]);
             if (combo[i] != playerCombo[i])
             {
                 isACombo = false;
             }
         }
         return isACombo;
+    }
+
+    private void HitAnEnemy(float damage)
+    {
+        Debug.Log("Searching for enemies...");
+        Collider[] enemies = Physics.OverlapSphere(_hitBox.position, .3f, LayerMask.GetMask("Enemy"));
+        if (enemies == null) return;
+        foreach (Collider enemy in enemies)
+        {
+            Debug.Log("Enemy found! " + enemy.transform.name);
+            enemy.GetComponent<EnemyManager>().TakeDamage(damage, transform.position);
+        }
     }
 
     private void ResetCombo()
