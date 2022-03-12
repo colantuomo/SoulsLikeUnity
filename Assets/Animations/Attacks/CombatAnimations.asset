@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fbf1ff933a5c1040b0cc4dc2bbd1683, type: 3}
+  m_Name: CombatAnimations
+  m_EditorClassIdentifier: 
+  animations:
+  - clip: {fileID: 7400000, guid: c873179f775b7444ebb53b7b9e329966, type: 2}
+    button: 0
+  - clip: {fileID: 7400000, guid: 4262d3de30244964fab9a713b5d507b4, type: 2}
+    button: 0
+  - clip: {fileID: 7400000, guid: 3bde1ae5d6d1a8a4ea77411a7815b18d, type: 2}
+    button: 1
+  - clip: {fileID: 7400000, guid: d050f1630cf86f94eae766674f7061c5, type: 2}
+    button: 0
+  - clip: {fileID: 7400000, guid: 84e8224ec1623754d85243b9334dec8f, type: 2}
+    button: 2

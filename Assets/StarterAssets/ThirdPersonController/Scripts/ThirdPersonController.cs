@@ -96,7 +96,7 @@ namespace StarterAssets
         private bool _hasAnimator;
 
         [Header("Testing space")]
-        public Transform _CustomTarget;
+        public float enemySearchRadius = 5.0f;
         private Vector2 currentInputVector;
         private Vector2 _inputVec;
         private bool _isRolling;
@@ -138,6 +138,10 @@ namespace StarterAssets
             if (PlayerStates.currentState != States.Attacking)
             {
                 Move();
+            }
+            else
+            {
+                MoveStrafe();
             }
         }
 
@@ -228,12 +232,6 @@ namespace StarterAssets
             {
                 _speed = targetSpeed;
             }
-
-            if (_input.strafe && !_isRolling)
-            {
-                MoveStrafe();
-                return;
-            }
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
             // normalise input direction
@@ -266,56 +264,73 @@ namespace StarterAssets
 
         private void MoveStrafe()
         {
-            currentInputVector = Vector2.SmoothDamp(currentInputVector, _input.move, ref _inputVec, .1f);
-            _animator.SetFloat("xValue", currentInputVector.x);
-            _animator.SetFloat("yValue", currentInputVector.y);
-            Vector3 direction = Vector3.zero;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, enemySearchRadius, LayerMask.GetMask("Enemy"));
+            Vector3 targetPosition = Vector3.zero;
+            var lastDistance = 10f;
+            foreach (Collider collider in colliders)
+            {
+                float targetDistance = Vector3.Distance(transform.position, collider.transform.position);
+                if (targetDistance < lastDistance)
+                {
+                    lastDistance = targetDistance;
+                    targetPosition = collider.transform.position;
+                }
+            }
+            if (targetPosition == Vector3.zero)
+            {
+                _input.strafe = false;
+                return;
+            }
+            // currentInputVector = Vector2.SmoothDamp(currentInputVector, _input.move, ref _inputVec, .1f);
+            // _animator.SetFloat("xValue", currentInputVector.x);
+            // _animator.SetFloat("yValue", currentInputVector.y);
+            // Vector3 direction = Vector3.zero;
 
-            if (_input.move.x > 0)
-            {
-                direction = transform.right;
-            }
-            else if (_input.move.x < 0)
-            {
-                direction = -transform.right;
-            }
-            if (_input.move.y > 0)
-            {
-                direction = transform.forward;
-            }
-            else if (_input.move.y < 0)
-            {
-                direction = -transform.forward;
-            }
+            // if (_input.move.x > 0)
+            // {
+            //     direction = transform.right;
+            // }
+            // else if (_input.move.x < 0)
+            // {
+            //     direction = -transform.right;
+            // }
+            // if (_input.move.y > 0)
+            // {
+            //     direction = transform.forward;
+            // }
+            // else if (_input.move.y < 0)
+            // {
+            //     direction = -transform.forward;
+            // }
 
-            // Diagonal movements
-            if (_input.move.y > 0 && _input.move.x < 0)
-            {
-                direction = transform.forward - transform.right;
-            }
+            // // Diagonal movements
+            // if (_input.move.y > 0 && _input.move.x < 0)
+            // {
+            //     direction = transform.forward - transform.right;
+            // }
 
-            if (_input.move.y > 0 && _input.move.x > 0)
-            {
-                direction = transform.forward - (-transform.right);
-            }
+            // if (_input.move.y > 0 && _input.move.x > 0)
+            // {
+            //     direction = transform.forward - (-transform.right);
+            // }
 
-            if (_input.move.y < 0 && _input.move.x < 0)
-            {
-                direction = (-transform.forward) - transform.right;
-            }
+            // if (_input.move.y < 0 && _input.move.x < 0)
+            // {
+            //     direction = (-transform.forward) - transform.right;
+            // }
 
-            if (_input.move.y < 0 && _input.move.x > 0)
-            {
-                direction = (-transform.forward) - (-transform.right);
-            }
+            // if (_input.move.y < 0 && _input.move.x > 0)
+            // {
+            //     direction = (-transform.forward) - (-transform.right);
+            // }
 
-            direction.Normalize();
+            // direction.Normalize();
 
-            _controller.Move(new Vector3(direction.x, _verticalVelocity, direction.z) * (Time.deltaTime * StrafeSpeed));
+            // _controller.Move(new Vector3(direction.x, _verticalVelocity, direction.z) * (Time.deltaTime * StrafeSpeed));
 
 
             // rotate towards the target
-            var _targetDirection = _CustomTarget.position - transform.position;
+            var _targetDirection = targetPosition - transform.position;
             _targetDirection.y = 0f;
             var _lookRotation = Quaternion.LookRotation(_targetDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, _lookRotation, Time.deltaTime * 15f);
@@ -398,8 +413,7 @@ namespace StarterAssets
             {
                 _input.strafe = false;
                 _currentRollInputDirection = _localInputMovement;
-                _animator.SetTrigger(_animIDRoll);
-                _isRolling = true;
+                AnimationsManager.Instance.ChangeAnimationState(AttackAnimations.ROLL);
                 _input.jump = false;
                 PlayerManager.PlayerStates.currentState = States.Walking;
             }
@@ -428,6 +442,11 @@ namespace StarterAssets
 
             // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, enemySearchRadius);
         }
     }
 }

@@ -21,53 +21,50 @@ public class CombatController : MonoBehaviour
     private PlayerInput _playerInput;
     private List<Attacks> _comboList = new List<Attacks>();
     public float comboTiming = 1f;
-    private float _timeRemaining;
     private bool _inCombo;
-    private int _comboSequence = 0;
     private StarterAssetsInputs _input;
 
     private Attacks[] combo1 = { Attacks.Light, Attacks.Light, Attacks.Heavy };
     private Attacks[] combo2 = { Attacks.Light, Attacks.Heavy };
+
+    private float _inputTimer;
+    private float _inputDelay = 0.1f;
 
     void Start()
     {
         _animator = GetComponent<Animator>();
         _playerInput = GetComponent<PlayerInput>();
         _input = GetComponent<StarterAssetsInputs>();
-        _timeRemaining = 0f;
         // _playerInput.onActionTriggered += ReadInputAction;
         // _blockingAction = _playerInput.currentActionMap.FindAction("Blocking");
     }
 
     private void Update()
     {
-        _animator.SetBool("InCombo", _inCombo);
+        if (_inputTimer <= 0)
+        {
+            _inputTimer = 0;
+        }
+        else
+        {
+            _inputTimer -= Time.deltaTime;
+        }
     }
 
     public void OnLightAttack(InputValue value)
     {
-        if (!_input.strafe) return;
-        _comboList.Add(Attacks.Light);
-        // _input.strafe = true;
-        // StartCoroutine(ExecuteLightAttack());
-        _animator.applyRootMotion = true;
-        PlayerStates.currentState = States.Attacking;
-        if (_inCombo) return;
-        _inCombo = true;
-        _animator.Play("Sword And Shield Slash");
+        // if (_input.move == Vector2.zero) return;
+        // _inputTimer = _inputDelay;
+        _input.strafe = true;
+        AnimationsManager.Instance.ChangeCombatAnimationState(Buttons.LightAttack);
     }
 
     public void OnHeavyAttack(InputValue value)
     {
+        // if (_input.move == Vector2.zero) return;
+        // _inputTimer = _inputDelay;
         _input.strafe = true;
-        _comboList.Add(Attacks.Heavy);
-        StartCoroutine(ExecuteHeavyAttack());
-        // StopAllCoroutines();
-        // _animator.applyRootMotion = true;
-        // PlayerStates.currentState = States.Attacking;
-        // if (_inCombo) return;
-        // _inCombo = true;
-        // _animator.CrossFade("Sword And Shield Attack", .1f, 0);
+        AnimationsManager.Instance.ChangeCombatAnimationState(Buttons.HeavyAttack);
     }
 
     private IEnumerator ExecuteLightAttack()
@@ -172,12 +169,12 @@ public class CombatController : MonoBehaviour
 
     private void HitAnEnemy(float damage)
     {
-        Debug.Log("Searching for enemies...");
+        // Debug.Log("Searching for enemies...");
         Collider[] enemies = Physics.OverlapSphere(_hitBox.position, .4f, LayerMask.GetMask("Enemy"));
         if (enemies == null) return;
         foreach (Collider enemy in enemies)
         {
-            Debug.Log("Enemy found! " + enemy.transform.name);
+            // Debug.Log("Enemy found! " + enemy.transform.name);
             enemy.GetComponent<EnemyManager>().TakeDamage(damage, transform.position);
         }
     }
@@ -185,7 +182,6 @@ public class CombatController : MonoBehaviour
     private void ResetCombo()
     {
         _inCombo = false;
-        _comboSequence = 0;
         _comboList.Clear();
         _animator.applyRootMotion = false;
         _animator.SetInteger("ComboSequence", 0);
