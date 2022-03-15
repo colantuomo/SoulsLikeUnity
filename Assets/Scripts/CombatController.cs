@@ -169,12 +169,10 @@ public class CombatController : MonoBehaviour
 
     private void HitAnEnemy(float damage)
     {
-        // Debug.Log("Searching for enemies...");
-        Collider[] enemies = Physics.OverlapSphere(_hitBox.position, .4f, LayerMask.GetMask("Enemy"));
+        Collider[] enemies = Physics.OverlapSphere(_hitBox.position, .6f, LayerMask.GetMask("Enemy"));
         if (enemies == null) return;
         foreach (Collider enemy in enemies)
         {
-            // Debug.Log("Enemy found! " + enemy.transform.name);
             enemy.GetComponent<EnemyManager>().TakeDamage(damage, transform.position);
         }
     }

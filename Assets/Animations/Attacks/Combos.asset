@@ -20,7 +20,7 @@ MonoBehaviour:
     - clip: {fileID: 7400000, guid: 4262d3de30244964fab9a713b5d507b4, type: 2}
       button: 0
     - clip: {fileID: 7400000, guid: 3bde1ae5d6d1a8a4ea77411a7815b18d, type: 2}
-      button: 0
+      button: 1
   - name: Heavy Combo
     animations:
     - clip: {fileID: 7400000, guid: 3bde1ae5d6d1a8a4ea77411a7815b18d, type: 2}
